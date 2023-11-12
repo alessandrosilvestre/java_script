@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400&display=swap" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/e7ebc2fc39.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Todo List - Fullture</title>
+</head>
+
+<body>
+    <header>
+        <h1 id='logado'></h1>
+        <h1>FULLTURE Todo List</h1>
+    </header>
+
+    <button onclick="logout()" class="logout-button">Logout</a></button>
+
+    <form>
+        <input type="text" class="todo-input" maxlength="40" />
+        <button class="todo-button" type="button">
+            <i class="fas fa-plus-square"></i>
+        </button>
+        <div class="select">
+            <select onchange="updatedList()" name="todos" class="filter-todo">
+                <option value="all">Todas</option>
+                <option value="completed">Finalizadas</option>
+                <option value="uncompleted">Não Finalizadas</option>
+            </select>
+        </div>
+    </form>
+    <div class="todo-container">
+        <ul class="todo-list">
+                        
+        </ul>
+    </div>
+   <script src="main.js"></script>
+   <script>
+    const todoInput = document.querySelector('.todo-input');
+        const todoButton = document.querySelector('.todo-button');
+        const todoList = document.querySelector('.todo-list');
+        
+
+        todoButton.addEventListener('click', addList);
+
+        let todos = [];
+
+        function addList() {
+            
+            let newtodo = {
+                id: `${Date.now()}`,
+                name: todoInput.value,
+                completed: "pending",
+            };
+
+            if (newtodo.name === "") {
+                return;
+            }
+
+            todos.push(newtodo);
+
+            localStorage.setItem("todos", JSON.stringify(todos));
+            updatedList();
+        }
+
+        function removeList(event) {
+            let id = event.target.dataset.id;
+
+            todos = todos.filter(function (todo) {
+                return todo.id !== id;
+            });
+
+            localStorage.setItem("todos", JSON.stringify(todos));
+            updatedList();
+        }
+
+        function finalizeList(event) {
+            let id = event.target.dataset.id;
+
+            todos.find((todo) => todo.id === id).completed = "completed";
+            
+            localStorage.setItem("todos", JSON.stringify(todos));            
+            updatedList();
+        }
+
+        function updatedList() {
+            todoList.innerHTML = '';
+            let filterOption = document.querySelector(".filter-todo").value;
+        
+            let filteredTodos;
+        
+            if (filterOption === "all") {
+                filteredTodos = todos;
+            } else if (filterOption === "completed") {
+                filteredTodos = todos.filter((item) => item.completed === "completed");
+            } else if (filterOption === "uncompleted") {
+                filteredTodos = todos.filter((item) => item.completed === "pending");
+            } else {
+                filteredTodos = todos;
+            }
+        
+            filteredTodos.forEach((todo) => {
+                let todoItem = document.createElement('div');
+        
+                if (todo.completed === "completed") {
+                    todoItem.classList.add('completed');
+                }
+        
+                todoItem.innerHTML = `
+                <div class="todo">
+                    <li class="todo-item">${todo.name}</li>
+                    <button data-id="${todo.id}" onclick="finalizeList(event)" class="check-btn"><i class="fas fa-check" aria-hidden="true"></i></button>
+                    <button data-id="${todo.id}" onclick="removeList(event)" class="trash-btn"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                </div>`;
+        
+                todoList.appendChild(todoItem);
+            });
+        }
+
+        if(localStorage.setItem('token') === null){
+            alert('Voce precisa estar logado para acessar esta pagina')
+            window.location.href = 'index.html'
+        }            
+
+        function logout(){
+            localStorage.removeItem('token')
+            window.location.href = 'index.html'
+
+        }
+        
+        
+
+   </script>
+     
+    
+</body>
+
+</html>
+
+
